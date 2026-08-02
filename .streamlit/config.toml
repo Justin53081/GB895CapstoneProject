@@ -2,6 +2,6 @@
 primaryColor = "#4A3996"
 backgroundColor = "#8C93E8"
 secondaryBackgroundColor = "#76BF45"
-textColor = "#EEEEEE"
+textColor = "#000000"
 font = "sans serif"
 codeFontWeight = 500
