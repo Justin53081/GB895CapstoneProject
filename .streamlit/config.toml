@@ -4,3 +4,4 @@ backgroundColor = "#76bf45"
 secondaryBackgroundColor = "#ffe1ba"
 textColor = "#000000"
 font = "sans serif"
+codeFontWeight = 500
