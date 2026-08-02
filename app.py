@@ -46,7 +46,7 @@ has_mindful_living = int(st.toggle("Has Mindful Living Subscription"))
 has_premium_health = int(st.toggle("Has Premium Health Subscription"))
 
 
-if st.button("Predict"):
+if st.button("Predict", type="secondary"):
 
     # Build categorical DataFrame — column names and must match encoder exactly
     raw = pd.DataFrame([{
