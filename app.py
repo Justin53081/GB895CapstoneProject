@@ -4,6 +4,13 @@ import numpy as np
 import pandas as pd
 import pickle
 
+#page setup
+st.set_page_config(
+    page_title="Churn Model",
+    page_icon="📊",
+    initial_sidebar_state="expanded"
+)
+
 # Load model and encoder once at startup (cached so they don't reload on every interaction)
 @st.cache_resource
 def load_artifacts():
