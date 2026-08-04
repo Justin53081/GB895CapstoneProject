@@ -7,7 +7,7 @@ import pickle
 #page setup
 st.set_page_config(
     page_title="Churn Model",
-    page_icon="📊",
+    page_icon="🌀",
     initial_sidebar_state="expanded"
 )
 
