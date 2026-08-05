@@ -24,7 +24,7 @@ model, encoder = load_artifacts()
 
 # ── UI ────────────────────────────────────────────────────────────────────────
 
-st.title("Customer Renewal Probability Predictor")
+st.title("Customer Churn Probability Predictor")
 st.write("Enter customer attributes to predict the likelihood of subscription renewal.")
 
 age               = st.number_input("Age", min_value=18, max_value=100, value=35)
@@ -81,13 +81,13 @@ if st.button("Predict", type="primary"):
     input_df = pd.concat([numeric_df, encoded_df], axis=1)
 
     # Column 1 = P(renewed), column 0 = P(churned)
-    probability = model.predict_proba(input_df)[0][1]
-    risk = "Low" if probability >= 0.6 else "Medium" if probability >= 0.4 else "High"
+    probability = 1-model.predict_proba(input_df)[0][1]
+    risk = "Low" if probability <= 0.33 else "Medium" if probability <= 0.66 else "High"
 
     st.metric("Renewal Probability", f"{probability:.2f}")
     if risk == "High":
-        st.error(f"Churn Risk: {risk}", icon="🔴")
+        st.error(f"Churn Risk: {risk:.2%}", icon="🔴")
     elif risk == "Medium":
-        st.warning(f"Churn Risk: {risk}", icon="🟡")
+        st.warning(f"Churn Risk: {risk:.2%}", icon="🟡")
     else:
-        st.success(f"Churn Risk: {risk}", icon="🟢")
+        st.success(f"Churn Risk: {risk:.2%}", icon="🟢")
