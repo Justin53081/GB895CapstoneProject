@@ -46,7 +46,7 @@ avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", mi
 st.header("Product Ownership")
 
 num_products_owned = st.slider("Number of Products Owned", min_value=0, max_value=5, value=3)
-num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=5, value=3)
+num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=num_products_owned, value=3)
 has_healthy_meals = int(st.toggle("Has Healthy Meals Subscription"))
 has_daily_fitness = int(st.toggle("Has Daily Fitness Subscription"))
 has_wellness_tracker = int(st.toggle("Has Wellness Tracker Subscription"))
@@ -97,6 +97,6 @@ if st.button("Predict", type="primary"):
         st.error(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🔴")
 
     elif risk == "Medium":
-        st.warning(f"Churn Risk: {risk}", icon="🟡")
+        st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🟡")
     else:
-        st.success(f"Churn Risk: {risk}", icon="🟢")
+        st.success(f"**Churn Risk: {risk}**", icon="🟢")
