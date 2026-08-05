@@ -54,7 +54,7 @@ model, encoder = load_artifacts()
 @st.cache_resource
 def load_histograms_data():
     try:
-        with open("histograms_with_figs.pkl", "rb") as f:
+        with open("pickled_artifacts/histograms_with_figs.pkl", "rb") as f:
             histograms_dict = pickle.load(f)
         return histograms_dict
     except FileNotFoundError:
@@ -65,3 +65,101 @@ def load_histograms_data():
         st.stop()
 
 histograms_data = load_histograms_data()
+
+# ── UI ────────────────────────────────────────────────────────────────────────
+
+st.title("Customer Churn Probability Predictor")
+st.write("Enter customer attributes to predict the likelihood of subscription renewal.")
+
+st.header("Customer Demographics")
+
+age               = st.number_input("Age", min_value=18, max_value=100, value=35)
+income_level      = st.radio("Income Level",  ["Low", "Medium", "High", "Very High"])
+education         = st.radio("Education",     ["Graduate", "High School", "Other", "Post-Graduate"])
+device_type       = st.radio("Device Type",   ["Desktop-only", "Mobile-only", "Multi-device"])
+tech_comfort_score = st.slider("Tech Comfort Score", min_value=1, max_value=5, value=3)
+
+st.header("Product Engagement Metrics")
+
+num_active_days = st.number_input("Number of Active Days", min_value=0, max_value=365, value=0)
+num_active_qtrs = st.number_input("Number of Active Quarters", min_value=0, max_value=4, value=2)
+total_session_length = st.number_input("Total Session Length", min_value=0, max_value=15601, value=1800)
+total_num_sessions = st.number_input("Total Number of Sessions", min_value=0, max_value=262, value=40)
+avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", min_value=0, max_value=500, value=150)
+
+st.header("Product Ownership")
+
+num_products_owned = st.slider("Number of Products Owned", min_value=0, max_value=5, value=3)
+num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=num_products_owned, value=3)
+has_healthy_meals = int(st.toggle("Has Healthy Meals Subscription"))
+has_daily_fitness = int(st.toggle("Has Daily Fitness Subscription"))
+has_wellness_tracker = int(st.toggle("Has Wellness Tracker Subscription"))
+has_mindful_living = int(st.toggle("Has Mindful Living Subscription"))
+has_premium_health = int(st.toggle("Has Premium Health Subscription"))
+
+
+if st.button("Predict", type="primary"):
+
+    # Build categorical DataFrame — column names and must match encoder exactly
+    raw = pd.DataFrame([{
+        'INCOME_LEVEL': income_level,
+        'EDUCATION':    education,
+        'DEVICE_TYPE':  device_type,
+    }])
+
+    # Apply the saved encoder (transform only — never fit_transform)
+    encoded = encoder.transform(raw)
+    encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out())
+
+    # Numeric features first, then encoded dummies — must match training column order
+    numeric_df = pd.DataFrame([{
+        'TOTAL_NUM_SESSIONS': total_num_sessions,
+        'TOTAL_SESSION_LENGTH': total_session_length,
+        'ACTIVE_DAYS': num_active_days,
+        'ACTIVE_PRODUCTS': num_active_products_owned,
+        'ACTIVE_QUARTERS': num_active_qtrs,
+        'AVG_SESSIONS_PER_ACTIVE_QUARTER': avg_sessions_per_qtr,
+        'AGE': age,
+        'TECH_COMFORT_SCORE': tech_comfort_score,
+        'PRODUCTS_OWNED': num_products_owned,
+        'HAS_HEALTHY_MEALS': has_healthy_meals,
+        'HAS_DAILY_FITNESS': has_daily_fitness,
+        'HAS_WELLNESS_TRACKER': has_wellness_tracker,
+        'HAS_MINDFUL_LIVING': has_mindful_living,
+        'HAS_PREMIUM_HEALTH': has_premium_health,
+
+    }])
+
+    input_df = pd.concat([numeric_df, encoded_df], axis=1)
+
+    # Column 1 = P(renewed), column 0 = P(churned)
+    probability = 1-model.predict_proba(input_df)[0][1]
+    risk = "Low" if probability <= 0.33 else "Medium" if probability <= 0.66 else "High"
+
+    st.metric("Churn Probability", f"{probability:.2%}")
+    if risk == "High":
+        st.error(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🔴")
+
+    elif risk == "Medium":
+        st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🟡")
+    else:
+        st.success(f"**Churn Risk: {risk}**", icon="🟢")
+
+# Display the plot with overlay after prediction
+    st.markdown("--- # Visualization")
+    selected_viz_feature = st.selectbox(
+    "Select Visual",
+    ('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH')
+)
+    st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
+
+    user_input_for_viz = input_df[selected_viz_feature].iloc[0]
+    if user_input_for_viz is not None:
+        original_fig_for_viz = histograms_data[selected_viz_feature]['fig']
+
+        # Call the overlay function with the original figure and the current input
+        modified_plot_fig = overlay_input_on_figure(original_fig_for_viz, selected_viz_feature, user_input_for_viz)
+        st.pyplot(modified_plot_fig)
+        plt.close(modified_plot_fig) # Close the figure to free up memory after displaying
+    else:
+        st.warning(f"Could not find an input value for '{selected_viz_feature}' to overlay.")
