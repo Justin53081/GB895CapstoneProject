@@ -99,7 +99,7 @@ st.header("Product Engagement Metrics")
 
 num_active_days = st.number_input("Number of Active Days", min_value=0, max_value=365, value=0)
 num_active_qtrs = st.number_input("Number of Active Quarters", min_value=0, max_value=4, value=2)
-total_session_length = st.number_input("Total Session Length", min_value=0, max_value=15601, value=1800)
+total_session_length = st.number_input("Total Session Length (mins)", min_value=0, max_value=15601, value=1800)
 total_num_sessions = st.number_input("Total Number of Sessions", min_value=0, max_value=262, value=40)
 avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", min_value=0, max_value=500, value=150)
 
