@@ -167,6 +167,10 @@ if st.button("Predict", type="primary"):
 
 # Display the plot with overlay after prediction
     st.markdown("--- # Visualization")
+    selected_viz_feature = st.selectbox(
+    "Select Visual", 
+    ('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH')
+)
     st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
 
     user_input_for_viz = current_user_inputs.get(selected_viz_feature)
