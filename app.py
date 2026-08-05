@@ -27,16 +27,24 @@ model, encoder = load_artifacts()
 st.title("Customer Churn Probability Predictor")
 st.write("Enter customer attributes to predict the likelihood of subscription renewal.")
 
+st.header("Customer Demographics")
+
 age               = st.number_input("Age", min_value=18, max_value=100, value=35)
 income_level      = st.radio("Income Level",  ["Low", "Medium", "High", "Very High"])
 education         = st.radio("Education",     ["Graduate", "High School", "Other", "Post-Graduate"])
 device_type       = st.radio("Device Type",   ["Desktop-only", "Mobile-only", "Multi-device"])
 tech_comfort_score = st.slider("Tech Comfort Score", min_value=1, max_value=5, value=3)
+
+st.header("Product Engagement Metrics")
+
 num_active_days = st.number_input("Number of Active Days", min_value=0, max_value=365, value=0)
 num_active_qtrs = st.number_input("Number of Active Quarters", min_value=0, max_value=4, value=2)
 total_session_length = st.number_input("Total Session Length", min_value=0, max_value=15601, value=1800)
 total_num_sessions = st.number_input("Total Number of Sessions", min_value=0, max_value=262, value=40)
 avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", min_value=0, max_value=500, value=150) 
+
+st.header("Product Ownership")
+
 num_products_owned = st.slider("Number of Products Owned", min_value=0, max_value=5, value=3)
 num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=5, value=3)
 has_healthy_meals = int(st.toggle("Has Healthy Meals Subscription"))
