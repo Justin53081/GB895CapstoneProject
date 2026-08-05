@@ -4,36 +4,6 @@ import numpy as np
 import pandas as pd
 import pickle
 
-# -- definitions----------
-def overlay_input_on_figure(fig_obj, field_name, input_value):
-  """
-  Overlays an input value as a scatter point on an existing Matplotlib Figure.
-
-  Args:
-    fig_obj (matplotlib.figure.Figure): The existing figure object to modify.
-    field_name (str): The name of the field, used for context in labels/title.
-    input_value: The value to plot as an overlay.
-
-  Returns:
-    matplotlib.figure.Figure: The modified figure object.
-  """
-  ax = fig_obj.get_axes()[0]
-
-  # Remove ALL existing scatter plots (markers) from the axes to ensure only one input is shown
-  for artist in list(ax.collections) + list(ax.lines): # Use list() to avoid issues if items are removed during iteration
-      if isinstance(artist, plt.matplotlib.collections.PathCollection) or isinstance(artist, plt.Line2D): # Check if it's a scatter plot or line
-          artist.remove()
-
-  # Plot the input_value as a dot.
-  # Use a distinct color and marker to make it stand out.
-  ax.scatter(x=input_value, y=0, color='red', marker='o', s=200, zorder=10, label=f'Current Input: {input_value}')
-
-  # Update the legend to include the new input marker
-  ax.legend()
-
-  return fig_obj
-
-
 #page setup
 st.set_page_config(
     page_title="Churn Model",
