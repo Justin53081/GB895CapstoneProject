@@ -103,41 +103,42 @@ has_wellness_tracker = int(st.toggle("Has Wellness Tracker Subscription"))
 has_mindful_living = int(st.toggle("Has Mindful Living Subscription"))
 has_premium_health = int(st.toggle("Has Premium Health Subscription"))
 
+# --- Create input_df BEFORE the Predict button so it's always available ---
+# Build categorical DataFrame — column names and must match encoder exactly
+raw = pd.DataFrame([{
+    'INCOME_LEVEL': income_level,
+    'EDUCATION':    education,
+    'DEVICE_TYPE':  device_type,
+}])
 
+# Apply the saved encoder (transform only — never fit_transform)
+encoded = encoder.transform(raw)
+encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out())
+
+# Numeric features first, then encoded dummies — must match training column order
+numeric_df = pd.DataFrame([{
+    'TOTAL_NUM_SESSIONS': total_num_sessions,
+    'TOTAL_SESSION_LENGTH': total_session_length,
+    'ACTIVE_DAYS': num_active_days,
+    'ACTIVE_PRODUCTS': num_active_products_owned,
+    'ACTIVE_QUARTERS': num_active_qtrs,
+    'AVG_SESSIONS_PER_ACTIVE_QUARTER': avg_sessions_per_qtr,
+    'AGE': age,
+    'TECH_COMFORT_SCORE': tech_comfort_score,
+    'PRODUCTS_OWNED': num_products_owned,
+    'HAS_HEALTHY_MEALS': has_healthy_meals,
+    'HAS_DAILY_FITNESS': has_daily_fitness,
+    'HAS_WELLNESS_TRACKER': has_wellness_tracker,
+    'HAS_MINDFUL_LIVING': has_mindful_living,
+    'HAS_PREMIUM_HEALTH': has_premium_health,
+
+}])
+
+input_df = pd.concat([numeric_df, encoded_df], axis=1)
+
+
+# --- Prediction Logic (only runs when button is clicked) ---
 if st.button("Predict", type="primary"):
-
-    # Build categorical DataFrame — column names and must match encoder exactly
-    raw = pd.DataFrame([{
-        'INCOME_LEVEL': income_level,
-        'EDUCATION':    education,
-        'DEVICE_TYPE':  device_type,
-    }])
-
-    # Apply the saved encoder (transform only — never fit_transform)
-    encoded = encoder.transform(raw)
-    encoded_df = pd.DataFrame(encoded, columns=encoder.get_feature_names_out())
-
-    # Numeric features first, then encoded dummies — must match training column order
-    numeric_df = pd.DataFrame([{
-        'TOTAL_NUM_SESSIONS': total_num_sessions,
-        'TOTAL_SESSION_LENGTH': total_session_length,
-        'ACTIVE_DAYS': num_active_days,
-        'ACTIVE_PRODUCTS': num_active_products_owned,
-        'ACTIVE_QUARTERS': num_active_qtrs,
-        'AVG_SESSIONS_PER_ACTIVE_QUARTER': avg_sessions_per_qtr,
-        'AGE': age,
-        'TECH_COMFORT_SCORE': tech_comfort_score,
-        'PRODUCTS_OWNED': num_products_owned,
-        'HAS_HEALTHY_MEALS': has_healthy_meals,
-        'HAS_DAILY_FITNESS': has_daily_fitness,
-        'HAS_WELLNESS_TRACKER': has_wellness_tracker,
-        'HAS_MINDFUL_LIVING': has_mindful_living,
-        'HAS_PREMIUM_HEALTH': has_premium_health,
-
-    }])
-
-    input_df = pd.concat([numeric_df, encoded_df], axis=1)
-
     # Column 1 = P(renewed), column 0 = P(churned)
     probability = 1-model.predict_proba(input_df)[0][1]
     risk = "Low" if probability <= 0.33 else "Medium" if probability <= 0.66 else "High"
@@ -151,20 +152,21 @@ if st.button("Predict", type="primary"):
     else:
         st.success(f"**Churn Risk: {risk}**", icon="🟢")
 
-# Display the plot with overlay after prediction
-    st.markdown("--- # Visualization")
-    selected_viz_feature = st.selectbox(
-    "Select Visual",
-    ('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH')
+# --- Visualization Logic (always runs) ---
+st.markdown("--- # Visualization")
+selected_viz_feature = st.selectbox(
+"Select Visual",
+('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH'),
+key='visual_feature_selector' # Added a unique key to preserve state
 )
-    st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
+st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
 
-    user_input_for_viz = input_df[selected_viz_feature].iloc[0]
-    if user_input_for_viz is not None:
-        # Call the overlay function, which now generates a new figure each time
-        # Pass histograms_data directly as the first argument
-        modified_plot_fig = overlay_input_on_figure(histograms_data, selected_viz_feature, user_input_for_viz)
-        st.pyplot(modified_plot_fig)
-        plt.close(modified_plot_fig) # Close the figure to free up memory after displaying
-    else:
-        st.warning(f"Could not find an input value for '{selected_viz_feature}' to overlay.")
+user_input_for_viz = input_df[selected_viz_feature].iloc[0]
+if user_input_for_viz is not None:
+    # Call the overlay function, which now generates a new figure each time
+    # Pass histograms_data directly as the first argument
+    modified_plot_fig = overlay_input_on_figure(histograms_data, selected_viz_feature, user_input_for_viz)
+    st.pyplot(modified_plot_fig)
+    plt.close(modified_plot_fig) # Close the figure to free up memory after displaying
+else:
+    st.warning(f"Could not find an input value for '{selected_viz_feature}' to overlay.")
