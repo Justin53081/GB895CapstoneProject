@@ -18,9 +18,9 @@ def load_artifacts():
         model = pickle.load(f)
     with open("encoder.pkl", "rb") as f:
         encoder = pickle.load(f)
-    with open("histograms_with_figs.pkl", "rb") as f:
-        histograms = pickle.load(f)
-    return model, encoder, histograms
+    #with open("histograms_with_figs.pkl", "rb") as f:
+        #histograms = pickle.load(f)
+    return model, encoder#, histograms
 
 model, encoder, histograms = load_artifacts()
 
