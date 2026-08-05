@@ -94,7 +94,8 @@ if st.button("Predict", type="primary"):
 
     st.metric("Churn Probability", f"{probability:.2%}")
     if risk == "High":
-        st.error(title="Churn Risk: {risk}", icon="🔴", body="luaren Ipsom text or something long enough to fill the text box a little. maybe even a return char /n or something")
+        st.error(f"**Churn Risk: {risk}**\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Cras interdum pretium tellus.", icon="🔴")
+
     elif risk == "Medium":
         st.warning(f"Churn Risk: {risk}", icon="🟡")
     else:
