@@ -18,11 +18,9 @@ def load_artifacts():
         model = pickle.load(f)
     with open("encoder.pkl", "rb") as f:
         encoder = pickle.load(f)
-    #with open("histograms_with_figs.pkl", "rb") as f:
-        #histograms = pickle.load(f)
-    return model, encoder#, histograms
+    return model, encoder
 
-model, encoder, histograms = load_artifacts()
+model, encoder = load_artifacts()
 
 # ── UI ────────────────────────────────────────────────────────────────────────
 
@@ -97,7 +95,7 @@ if st.button("Predict", type="primary"):
     st.metric("Churn Probability", f"{probability:.2%}")
     if risk == "High":
         st.error(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🔴")
-        st.pyplot(histograms["PRODUCTS_OWNED"]['fig'])
+        #st.pyplot(histograms["PRODUCTS_OWNED"]['fig'])
 
     elif risk == "Medium":
         st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🟡")
