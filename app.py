@@ -27,7 +27,8 @@ def overlay_input_on_figure(fig_obj, field_name, input_value):
   """
   ax = fig_obj.get_axes()[0]
 
-  # Remove ALL existing scatter plots (markers) from the axes to ensure only one input is shown
+  # Remove ALL existing scatter plots (markers) and lines from the axes to ensure only one input is shown.
+  # This is the correct and robust way to clear previous markers without relying on internal Matplotlib attributes like '_axis_map'.
   for artist in list(ax.collections) + list(ax.lines):
       if isinstance(artist, plt.matplotlib.collections.PathCollection) or isinstance(artist, plt.Line2D):
           artist.remove()
@@ -85,7 +86,7 @@ num_active_days = st.number_input("Number of Active Days", min_value=0, max_valu
 num_active_qtrs = st.number_input("Number of Active Quarters", min_value=0, max_value=4, value=2)
 total_session_length = st.number_input("Total Session Length", min_value=0, max_value=15601, value=1800)
 total_num_sessions = st.number_input("Total Number of Sessions", min_value=0, max_value=262, value=40)
-avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", min_value=0, max_value=500, value=150) 
+avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", min_value=0, max_value=500, value=150)
 
 st.header("Product Ownership")
 
@@ -127,7 +128,7 @@ if st.button("Predict", type="primary"):
         'HAS_WELLNESS_TRACKER': has_wellness_tracker,
         'HAS_MINDFUL_LIVING': has_mindful_living,
         'HAS_PREMIUM_HEALTH': has_premium_health,
-        
+
     }])
 
     input_df = pd.concat([numeric_df, encoded_df], axis=1)
@@ -148,7 +149,7 @@ if st.button("Predict", type="primary"):
 # Display the plot with overlay after prediction
     st.markdown("--- # Visualization")
     selected_viz_feature = st.selectbox(
-    "Select Visual", 
+    "Select Visual",
     ('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH')
 )
     st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
