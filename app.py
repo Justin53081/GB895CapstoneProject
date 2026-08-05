@@ -4,25 +4,6 @@ import numpy as np
 import pandas as pd
 import pickle
 
-#page setup
-st.set_page_config(
-    page_title="Churn Model",
-    page_icon="🌀",
-    initial_sidebar_state="expanded"
-)
-
-# Load model and encoder once at startup (cached so they don't reload on every interaction)
-@st.cache_resource
-def load_artifacts():
-    with open("xgb_model.pkl", "rb") as f:
-        model = pickle.load(f)
-    with open("encoder.pkl", "rb") as f:
-        encoder = pickle.load(f)
-    with open("histograms_with_figs.pkl", "rb") as f:
-        histograms = pickle.load(f)
-    return model, encoder, histograms
-
-model, encoder, histograms = load_artifacts()
 # -- definitions----------
 def overlay_input_on_figure(fig_obj, field_name, input_value):
   """
@@ -51,6 +32,27 @@ def overlay_input_on_figure(fig_obj, field_name, input_value):
   ax.legend()
 
   return fig_obj
+
+
+#page setup
+st.set_page_config(
+    page_title="Churn Model",
+    page_icon="🌀",
+    initial_sidebar_state="expanded"
+)
+
+# Load model and encoder once at startup (cached so they don't reload on every interaction)
+@st.cache_resource
+def load_artifacts():
+    with open("xgb_model.pkl", "rb") as f:
+        model = pickle.load(f)
+    with open("encoder.pkl", "rb") as f:
+        encoder = pickle.load(f)
+    with open("histograms_with_figs.pkl", "rb") as f:
+        histograms = pickle.load(f)
+    return model, encoder, histograms
+
+model, encoder, histograms = load_artifacts()
 
 # ── UI ────────────────────────────────────────────────────────────────────────
 
