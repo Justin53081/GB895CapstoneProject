@@ -153,7 +153,7 @@ if st.button("Predict", type="primary"):
         st.success(f"**Churn Risk: {risk}**", icon="🟢")
 
 # --- Visualization Logic (always runs) ---
-st.markdown("--- # Visualization")
+st.header("Customer Explorer")
 selected_viz_feature = st.selectbox(
 "Select Visual",
 ('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH'),
