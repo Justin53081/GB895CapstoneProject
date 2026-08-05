@@ -173,7 +173,7 @@ if st.button("Predict", type="primary"):
 )
     st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
 
-    user_input_for_viz = current_user_inputs.get(selected_viz_feature)
+    user_input_for_viz = input_df[selected_viz_feature].iloc[0]
     if user_input_for_viz is not None:
         original_fig_for_viz = histograms_data[selected_viz_feature]['fig']
 
