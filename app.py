@@ -54,11 +54,11 @@ model, encoder = load_artifacts()
 @st.cache_resource
 def load_histograms_data():
     try:
-        with open("pickled_artifacts/histograms_with_figs.pkl", "rb") as f:
+        with open("histograms_with_figs.pkl", "rb") as f:
             histograms_dict = pickle.load(f)
         return histograms_dict
     except FileNotFoundError:
-        st.error("Error: pickled_artifacts/histograms_with_figs.pkl not found. Please ensure it's in the correct path.")
+        st.error("Error: histograms_with_figs.pkl not found. Please ensure it's in the correct path.")
         st.stop()
     except Exception as e:
         st.error(f"Error loading histograms: {e}")
