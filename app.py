@@ -164,3 +164,18 @@ if st.button("Predict", type="primary"):
         st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🟡")
     else:
         st.success(f"**Churn Risk: {risk}**", icon="🟢")
+
+# Display the plot with overlay after prediction
+    st.markdown("--- # Visualization")
+    st.subheader(f"Distribution of '{selected_viz_feature}' for Churned Customers with Your Input")
+
+    user_input_for_viz = current_user_inputs.get(selected_viz_feature)
+    if user_input_for_viz is not None:
+        original_fig_for_viz = histograms_data[selected_viz_feature]['fig']
+
+        # Call the overlay function with the original figure and the current input
+        modified_plot_fig = overlay_input_on_figure(original_fig_for_viz, selected_viz_feature, user_input_for_viz)
+        st.pyplot(modified_plot_fig)
+        plt.close(modified_plot_fig) # Close the figure to free up memory after displaying
+    else:
+        st.warning(f"Could not find an input value for '{selected_viz_feature}' to overlay.")
