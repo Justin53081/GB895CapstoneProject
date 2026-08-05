@@ -3,6 +3,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
+import matplotlib as plt
 
 #page setup
 st.set_page_config(
@@ -11,6 +12,54 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Define the overlay_input_on_figure function
+def overlay_input_on_figure(fig_obj, field_name, input_value):
+  """
+  Overlays an input value as a scatter point on an existing Matplotlib Figure.
+
+  Args:
+    fig_obj (matplotlib.figure.Figure): The existing figure object to modify.
+    field_name (str): The name of the field, used for context in labels/title.
+    input_value: The value to plot as an overlay.
+
+  Returns:
+    matplotlib.figure.Figure: The modified figure object.
+  """
+  # Create a temporary figure to copy content from the original.
+  # This is a workaround for safely modifying cached figures in Streamlit
+  # without directly deepcopying the entire figure, which can be problematic.
+  temp_fig = plt.figure(figsize=fig_obj.get_size_inches())
+  temp_ax = temp_fig.add_subplot(111)
+
+  # Copy the artists from the original figure's first axes to the new temporary axes
+  original_ax = fig_obj.get_axes()[0]
+  for artist in original_ax.get_children():
+      if isinstance(artist, plt.Artist):
+          temp_ax.add_artist(artist)
+
+  # Copy properties like title, labels, limits
+  temp_ax.set_title(original_ax.get_title())
+  temp_ax.set_xlabel(original_ax.get_xlabel())
+  temp_ax.set_ylabel(original_ax.get_ylabel())
+  temp_ax.set_xlim(original_ax.get_xlim())
+  temp_ax.set_ylim(original_ax.get_ylim())
+
+  # Get the axes from the temporary figure for modifications
+  ax = temp_fig.get_axes()[0]
+
+  # Remove ALL existing scatter plots (markers) from the axes to ensure only one input is shown
+  for artist in list(ax.collections) + list(ax.lines): 
+      if isinstance(artist, plt.matplotlib.collections.PathCollection) or isinstance(artist, plt.Line2D): 
+          artist.remove()
+
+  # Plot the input_value as a dot.
+  # Use a distinct color and marker to make it stand out.
+  ax.scatter(x=input_value, y=0, color='red', marker='o', s=200, zorder=10, label=f'Current Input: {input_value}')
+
+  # Update the legend to include the new input marker
+  ax.legend()
+
+  return temp_fig # Return the temporary figure
 # Load model and encoder once at startup (cached so they don't reload on every interaction)
 @st.cache_resource
 def load_artifacts():
