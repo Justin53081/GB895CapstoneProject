@@ -5,3 +5,4 @@ scikit-learn
 xgboost
 starlette<0.40.0
 matplotlib
+seaborn
