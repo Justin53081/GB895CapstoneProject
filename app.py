@@ -47,7 +47,7 @@ def overlay_input_on_figure(histograms_data, field_name, input_value):
   ax.set_title(f'Distribution of {field_name} (Churned Customers)')
 
   # Add vertical line for the input value
-  ax.axvline(x=input_value, color='red', linestyle='--', linewidth=2, label=f'Current Input: {input_value}')
+  ax.axvline(x=input_value, color='red', linestyle='--', linewidth=4, label=f'Current Customer: {input_value}')
 
   ax.legend()
   fig.tight_layout() # Adjust layout to prevent labels from overlapping
