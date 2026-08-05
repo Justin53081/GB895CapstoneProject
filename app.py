@@ -33,8 +33,16 @@ def overlay_input_on_figure(histograms_data, field_name, input_value):
 
   fig, ax = plt.subplots(figsize=(8, 4)) # Create a new figure and axes each time
 
+  # Determine appropriate bins for the histogram
+  if data_series.nunique() <= 2 and data_series.min() >= 0 and data_series.max() <= 1:
+      # Likely a binary feature (0 or 1), set bins to 2 for clear representation
+      bins_param = 2
+  else:
+      # For other numeric/categorical features, let seaborn decide or use 'auto'
+      bins_param = 'auto'
+
   # Always use histplot as per user's instruction
-  sns.histplot(data_series, ax=ax, kde=False) # kde=False to remove the density line
+  sns.histplot(data_series, ax=ax, kde=False, bins=bins_param) # kde=False to remove the density line, added bins
   ax.set_xlabel(field_name)
   ax.set_title(f'Distribution of {field_name} (Churned Customers)')
 
