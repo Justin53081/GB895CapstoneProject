@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import pickle
 import matplotlib.pyplot as plt
+import seaborn as sns # Added for sns.histplot
 
 #page setup
 st.set_page_config(
@@ -12,34 +13,38 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Define the overlay_input_on_figure function
-def overlay_input_on_figure(fig_obj, field_name, input_value):
+# Define the overlay_input_on_figure function (UPDATED)
+def overlay_input_on_figure(histograms_data, field_name, input_value):
   """
-  Overlays an input value as a vertical line on an existing Matplotlib Figure.
+  Generates a new plot for a given field from stored data and overlays an input value.
 
   Args:
-    fig_obj (matplotlib.figure.Figure): The existing figure object to modify.
-    field_name (str): The name of the field, used for context in labels/title.
+    histograms_data (dict): The dictionary containing plot data and metadata.
+    field_name (str): The name of the field to plot.
     input_value: The value to plot as an overlay.
 
   Returns:
-    matplotlib.figure.Figure: The modified figure object.
+    matplotlib.figure.Figure: A newly generated figure object with the overlay.
   """
-  ax = fig_obj.get_axes()[0]
+  # Retrieve data and plot type from the loaded histograms_data
+  plot_info = histograms_data[field_name]
+  data_series = plot_info['data']
+  plot_type = plot_info['plot_type'] # This will now consistently be 'histplot'
 
-  # Remove ALL existing vertical lines or scatter points from the axes to ensure only one input is shown.
-  for artist in list(ax.collections) + list(ax.lines):
-      # Check if it's a scatter plot (PathCollection) or a line (Line2D), and remove it
-      if isinstance(artist, plt.matplotlib.collections.PathCollection) or isinstance(artist, plt.Line2D):
-          artist.remove()
+  fig, ax = plt.subplots(figsize=(8, 4)) # Create a new figure and axes each time
 
-  # Plot the input_value as a vertical line.
+  # Always use histplot as per user's instruction
+  sns.histplot(data_series, ax=ax, kde=False) # kde=False to remove the density line
+  ax.set_xlabel(field_name)
+  ax.set_title(f'Distribution of {field_name} (Churned Customers)')
+
+  # Add vertical line for the input value
   ax.axvline(x=input_value, color='red', linestyle='--', linewidth=2, label=f'Current Input: {input_value}')
 
-  # Update the legend to include the new input marker
   ax.legend()
+  fig.tight_layout() # Adjust layout to prevent labels from overlapping
+  return fig
 
-  return fig_obj # Return the modified figure object directly
 # Load model and encoder once at startup (cached so they don't reload on every interaction)
 @st.cache_resource
 def load_artifacts():
@@ -54,11 +59,12 @@ model, encoder = load_artifacts()
 @st.cache_resource
 def load_histograms_data():
     try:
-        with open("histograms_with_figs.pkl", "rb") as f:
+        # The pickled file now contains data series, stats, and plot_type, not Figure objects
+        with open("pickled_artifacts/histograms_with_figs.pkl", "rb") as f:
             histograms_dict = pickle.load(f)
         return histograms_dict
     except FileNotFoundError:
-        st.error("Error: histograms_with_figs.pkl not found. Please ensure it's in the correct path.")
+        st.error("Error: pickled_artifacts/histograms_with_figs.pkl not found. Please ensure it's in the correct path.")
         st.stop()
     except Exception as e:
         st.error(f"Error loading histograms: {e}")
@@ -141,7 +147,7 @@ if st.button("Predict", type="primary"):
         st.error(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🔴")
 
     elif risk == "Medium":
-        st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🟡")
+        st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk:\n\n  * Device Type is Multi Device\n\n  * Low Tech Comfort Score\n\n  * Low Number of Products Owned", icon="🟡")
     else:
         st.success(f"**Churn Risk: {risk}**", icon="🟢")
 
@@ -155,10 +161,9 @@ if st.button("Predict", type="primary"):
 
     user_input_for_viz = input_df[selected_viz_feature].iloc[0]
     if user_input_for_viz is not None:
-        original_fig_for_viz = histograms_data[selected_viz_feature]['fig']
-
-        # Call the overlay function with the original figure and the current input
-        modified_plot_fig = overlay_input_on_figure(original_fig_for_viz, selected_viz_feature, user_input_for_viz)
+        # Call the overlay function, which now generates a new figure each time
+        # Pass histograms_data directly as the first argument
+        modified_plot_fig = overlay_input_on_figure(histograms_data, selected_viz_feature, user_input_for_viz)
         st.pyplot(modified_plot_fig)
         plt.close(modified_plot_fig) # Close the figure to free up memory after displaying
     else:
