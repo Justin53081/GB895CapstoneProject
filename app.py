@@ -84,10 +84,10 @@ if st.button("Predict", type="primary"):
     probability = 1-model.predict_proba(input_df)[0][1]
     risk = "Low" if probability <= 0.33 else "Medium" if probability <= 0.66 else "High"
 
-    st.metric("Renewal Probability", f"{probability:.2f}")
+    st.metric("Renewal Probability", f"{probability:.2%}")
     if risk == "High":
-        st.error(f"Churn Risk: {risk:.2%}", icon="🔴")
+        st.error(f"Churn Risk: {risk}", icon="🔴")
     elif risk == "Medium":
-        st.warning(f"Churn Risk: {risk:.2%}", icon="🟡")
+        st.warning(f"Churn Risk: {risk}", icon="🟡")
     else:
-        st.success(f"Churn Risk: {risk:.2%}", icon="🟢")
+        st.success(f"Churn Risk: {risk}", icon="🟢")
