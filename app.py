@@ -3,7 +3,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 #page setup
 st.set_page_config(
