@@ -85,7 +85,7 @@ histograms_data = load_histograms_data()
 # ── UI ────────────────────────────────────────────────────────────────────────
 
 st.title("Customer Churn Probability Predictor")
-st.write("Enter customer attributes to predict the likelihood of subscription churn.")
+st.write("Enter customer attributes to predict the likelihood of subscription renewal.")
 
 st.header("Customer Demographics")
 
@@ -99,19 +99,29 @@ st.header("Product Engagement Metrics")
 
 num_active_days = st.number_input("Number of Active Days", min_value=0, max_value=365, value=0)
 num_active_qtrs = st.number_input("Number of Active Quarters", min_value=0, max_value=4, value=2)
-total_session_length = st.number_input("Total Session Length (mins)", min_value=0, max_value=15601, value=1800)
+total_session_length = st.number_input("Total Session Length", min_value=0, max_value=15601, value=1800)
 total_num_sessions = st.number_input("Total Number of Sessions", min_value=0, max_value=262, value=40)
 avg_sessions_per_qtr = st.number_input("Average Sessions per Active Quarter", min_value=0, max_value=500, value=150)
 
 st.header("Product Ownership")
 
-num_products_owned = st.slider("Number of Products Owned", min_value=0, max_value=5, value=3)
-num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=5, value=3)
+# Removed: num_products_owned = st.slider("Number of Products Owned", min_value=0, max_value=5, value=3)
 has_healthy_meals = int(st.toggle("Has Healthy Meals Subscription"))
 has_daily_fitness = int(st.toggle("Has Daily Fitness Subscription"))
 has_wellness_tracker = int(st.toggle("Has Wellness Tracker Subscription"))
 has_mindful_living = int(st.toggle("Has Mindful Living Subscription"))
 has_premium_health = int(st.toggle("Has Premium Health Subscription"))
+
+# Calculate num_products_owned based on active toggles
+num_products_owned = (
+    has_healthy_meals +
+    has_daily_fitness +
+    has_wellness_tracker +
+    has_mindful_living +
+    has_premium_health
+)
+
+num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=num_products_owned, value=min(3, num_products_owned))
 
 # --- Create input_df BEFORE the Predict button so it's always available ---
 # Build categorical DataFrame — column names and must match encoder exactly
@@ -163,7 +173,7 @@ if st.button("Predict", type="primary"):
         st.success(f"**Churn Risk: {risk}**", icon="🟢")
 
 # --- Visualization Logic (always runs) ---
-st.header("Customer Explorer")
+st.markdown("--- # Visualization")
 selected_viz_feature = st.selectbox(
 "Select Visual",
 ('TOTAL_NUM_SESSIONS', 'TOTAL_SESSION_LENGTH', 'ACTIVE_DAYS', 'ACTIVE_PRODUCTS', 'ACTIVE_QUARTERS', 'AVG_SESSIONS_PER_ACTIVE_QUARTER','AGE', 'TECH_COMFORT_SCORE', 'PRODUCTS_OWNED', 'HAS_HEALTHY_MEALS', 'HAS_DAILY_FITNESS', 'HAS_WELLNESS_TRACKER', 'HAS_MINDFUL_LIVING', 'HAS_PREMIUM_HEALTH'),
