@@ -169,7 +169,7 @@ if st.button("Predict", type="primary"):
 
     st.metric("Churn Probability", f"{probability:.2%}")
     if risk == "High":
-        st.error(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned", icon="🔴")
+        st.error(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk: \n\n  * Device Type is Multi Device \n\n  * Low Tech Comfort Score \n\n  * Low Number of Products Owned\n\n**Check the Customer Viewer Below to see how this customer compares.", icon="🔴")
 
     elif risk == "Medium":
         st.warning(f"**Churn Risk: {risk}**\n\nTop Three Reasons for High Churn Risk:\n\n  * Device Type is Multi Device\n\n  * Low Tech Comfort Score\n\n  * Low Number of Products Owned", icon="🟡")
