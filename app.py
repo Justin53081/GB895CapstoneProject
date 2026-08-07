@@ -85,7 +85,7 @@ histograms_data = load_histograms_data()
 # ── UI ────────────────────────────────────────────────────────────────────────
 
 st.title("Customer Churn Probability Predictor")
-st.write("Enter customer attributes to predict the likelihood of subscription renewal.")
+st.write("Enter customer attributes to predict the likelihood of subscription churn.")
 
 st.header("Customer Demographics")
 
