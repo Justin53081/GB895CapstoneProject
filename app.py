@@ -121,7 +121,11 @@ num_products_owned = (
     has_premium_health
 )
 
-num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=num_products_owned, value=min(3, num_products_owned))
+# Conditionally display the slider for num_active_products_owned
+if num_products_owned == 0:
+    num_active_products_owned = 0
+else:
+    num_active_products_owned = st.slider("Number of Active Products Owned", min_value=0, max_value=num_products_owned, value=min(3, num_products_owned))
 
 # --- Create input_df BEFORE the Predict button so it's always available ---
 # Build categorical DataFrame — column names and must match encoder exactly
